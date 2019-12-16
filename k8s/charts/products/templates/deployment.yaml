@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: products
+  labels:
+    app: products
+    tag: dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: products
+  template:
+    metadata:
+      labels:
+        app: products
+    spec:
+      containers:
+      - image: agimenezibanez/nameko-example-products:dev
+        imagePullPolicy: Always
+        name: products
+        env:
+          - name: REDIS_HOST
+            value: cache-redis-master
+          - name: REDIS_INDEX
+            value: "11"
+          - name: REDIS_PORT
+            value: "6379"
+          - name: REDIS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cache-redis
+                key: redis-password
+          - name: RABBIT_HOST
+            value: broker-rabbitmq
+          - name: RABBIT_MANAGEMENT_PORT
+            value: "15672"
+          - name: RABBIT_PORT
+            value: "5672"
+          - name: RABBIT_USER
+            value: user
+          - name: RABBIT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: broker-rabbitmq
+                key: rabbitmq-password
+      restartPolicy: Always
+   
